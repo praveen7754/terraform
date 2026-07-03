@@ -7,6 +7,11 @@ variable "cluster_name" {
   type        = string
 }
 
+variable "environment" {
+  description = "Environment name (production, staging, development)"
+  type        = string
+}
+
 variable "node_groups" {
   description = "Map of node group configurations"
   type = map(object({

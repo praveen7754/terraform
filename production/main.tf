@@ -328,9 +328,10 @@ module "eks" {
 module "node_group" {
   source = "../modules/node-group"
 
-  cluster_name      = module.eks.cluster_id
-  node_role_arn     = module.iam.role_arns["eks_node_group"]
-  subnet_ids        = module.subnet.private_subnet_ids
+  cluster_name       = module.eks.cluster_id
+  environment        = var.environment
+  node_role_arn      = module.iam.role_arns["eks_node_group"]
+  subnet_ids         = module.subnet.private_subnet_ids
   security_group_ids = [module.security_group.security_group_ids["eks_nodes"]]
 
   node_groups = {
