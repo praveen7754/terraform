@@ -21,12 +21,12 @@ resource "aws_security_group" "main" {
 
 # Create ingress rules
 resource "aws_security_group_rule" "ingress" {
-  for_each = {
-    for rule_key, rule in flatten([
-      for sg_name, sg_config in var.security_groups :
-      [for idx, rule in sg_config.ingress_rules : "${sg_name}:ingress:${idx}" => merge(rule, { sg_name = sg_name })]
-    ]) : rule_key => rule
-  }
+  for_each = merge([
+    for sg_name, sg_config in var.security_groups : {
+      for idx, rule in sg_config.ingress_rules :
+      "${sg_name}:ingress:${idx}" => merge(rule, { sg_name = sg_name })
+    }
+  ]...)
 
   type              = "ingress"
   from_port         = each.value.from_port
@@ -42,12 +42,12 @@ resource "aws_security_group_rule" "ingress" {
 
 # Create egress rules (default: allow all outbound)
 resource "aws_security_group_rule" "egress" {
-  for_each = {
-    for rule_key, rule in flatten([
-      for sg_name, sg_config in var.security_groups :
-      [for idx, rule in sg_config.egress_rules : "${sg_name}:egress:${idx}" => merge(rule, { sg_name = sg_name })]
-    ]) : rule_key => rule
-  }
+  for_each = merge([
+    for sg_name, sg_config in var.security_groups : {
+      for idx, rule in sg_config.egress_rules :
+      "${sg_name}:egress:${idx}" => merge(rule, { sg_name = sg_name })
+    }
+  ]...)
 
   type              = "egress"
   from_port         = each.value.from_port
