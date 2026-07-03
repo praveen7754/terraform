@@ -22,17 +22,20 @@ resource "aws_security_group" "main" {
 # Create ingress rules
 resource "aws_security_group_rule" "ingress" {
   for_each = {
-    for sg_name, sg_config in var.security_groups :
-    sg_name => sg_config.ingress_rules...
-  }[*] if length(var.security_groups) > 0
+    for rule_key, rule in flatten([
+      for sg_name, sg_config in var.security_groups :
+      [for idx, rule in sg_config.ingress_rules : "${sg_name}:ingress:${idx}" => merge(rule, { sg_name = sg_name })]
+    ]) : rule_key => rule
+  }
 
   type              = "ingress"
   from_port         = each.value.from_port
   to_port           = each.value.to_port
   protocol          = each.value.protocol
-  cidr_blocks       = each.value.cidr_blocks
-  security_group_id = aws_security_group.main[each.key].id
-  description       = each.value.description
+  cidr_blocks       = lookup(each.value, "cidr_blocks", [])
+  security_groups   = lookup(each.value, "security_groups", [])
+  security_group_id = aws_security_group.main[each.value.sg_name].id
+  description       = lookup(each.value, "description", "")
 
   depends_on = [aws_security_group.main]
 }
@@ -40,17 +43,20 @@ resource "aws_security_group_rule" "ingress" {
 # Create egress rules (default: allow all outbound)
 resource "aws_security_group_rule" "egress" {
   for_each = {
-    for sg_name, sg_config in var.security_groups :
-    sg_name => sg_config.egress_rules...
-  }[*] if length(var.security_groups) > 0
+    for rule_key, rule in flatten([
+      for sg_name, sg_config in var.security_groups :
+      [for idx, rule in sg_config.egress_rules : "${sg_name}:egress:${idx}" => merge(rule, { sg_name = sg_name })]
+    ]) : rule_key => rule
+  }
 
   type              = "egress"
   from_port         = each.value.from_port
   to_port           = each.value.to_port
   protocol          = each.value.protocol
-  cidr_blocks       = each.value.cidr_blocks
-  security_group_id = aws_security_group.main[each.key].id
-  description       = each.value.description
+  cidr_blocks       = lookup(each.value, "cidr_blocks", [])
+  security_groups   = lookup(each.value, "security_groups", [])
+  security_group_id = aws_security_group.main[each.value.sg_name].id
+  description       = lookup(each.value, "description", "")
 
   depends_on = [aws_security_group.main]
 }

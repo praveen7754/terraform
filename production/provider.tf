@@ -9,7 +9,6 @@ The AWS credentials are loaded from:
 */
 
 provider "aws" {
-  # TODO: Replace with your AWS region
   region = var.aws_region
 
   # Tags applied to all resources created by this provider
@@ -22,10 +21,4 @@ provider "aws" {
       CreatedAt   = timeadd(timestamp(), "0s")
     }
   }
-}
-
-# Configure the default provider behavior
-# Retry transient errors
-provider "aws" {
-  skip_requesting_account_id = false
 }

@@ -38,15 +38,14 @@ resource "aws_iam_policy" "main" {
 # Attach policies to roles
 resource "aws_iam_role_policy_attachment" "main" {
   for_each = {
-    for name, attachments in var.role_policy_attachments :
-    name => attachments
-  } if length(var.role_policy_attachments) > 0
+    for attachment_key, policy_arn in flatten([
+      for role_name, policy_arns in var.role_policy_attachments :
+      [for arn in policy_arns : "${role_name}:${arn}"]
+    ]) : attachment_key => policy_arn
+  }
 
-  role       = each.key
-  policy_arn = each.value
+  role       = split(":", each.value)[0]
+  policy_arn = split(":", each.value)[1]
 
-  depends_on = [
-    aws_iam_role.main,
-    aws_iam_policy.main
-  ]
+  depends_on = [aws_iam_role.main]
 }
