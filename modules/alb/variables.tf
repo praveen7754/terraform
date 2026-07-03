@@ -2,6 +2,16 @@
 ALB Module - Input Variables
 */
 
+variable "project_name" {
+  description = "Project name for resource naming"
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+}
+
 variable "alb_name" {
   description = "Name of the Application Load Balancer"
   type        = string
@@ -56,9 +66,4 @@ variable "tags" {
   description = "Tags for ALB resources"
   type        = map(string)
   default     = {}
-}
-
-variable "environment" {
-  description = "Environment name"
-  type        = string
 }

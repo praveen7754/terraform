@@ -124,8 +124,9 @@ module "route_table" {
 module "security_group" {
   source = "../modules/security-group"
 
-  vpc_id      = module.vpc.vpc_id
-  environment = var.environment
+  project_name = var.project_name
+  environment  = var.environment
+  vpc_id       = module.vpc.vpc_id
 
   security_groups = {
     alb = {
@@ -367,11 +368,12 @@ module "node_group" {
 module "alb" {
   source = "../modules/alb"
 
+  project_name       = var.project_name
+  environment        = var.environment
   alb_name           = "${var.project_name}-alb"
   vpc_id             = module.vpc.vpc_id
   subnet_ids         = module.subnet.public_subnet_ids
   security_group_ids = [module.security_group.security_group_ids["alb"]]
-  environment        = var.environment
 
   enable_deletion_protection = var.alb_deletion_protection
   enable_http2               = true
