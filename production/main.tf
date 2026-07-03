@@ -272,7 +272,8 @@ module "iam" {
 module "ecr" {
   source = "../modules/ecr"
 
-  environment = var.environment
+  project_name = var.project_name
+  environment  = var.environment
 
   repositories = {
     api_service = {
